@@ -1,7 +1,3 @@
-### README for Dental Management Platform
-
----
-
 ## Project Overview
 
 This Dental Management System aims to manage patient and provider data efficiently across multiple clinics. This Django-based platform allows administrative users to manage three main entities: **Clinics**, **Doctors**, and **Patients**, including scheduling appointments and tracking visits.
