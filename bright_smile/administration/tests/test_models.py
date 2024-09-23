@@ -1,8 +1,12 @@
-from django.test import TestCase
+from datetime import time
+
 from django.core.exceptions import ValidationError
-from datetime import datetime, time
+from django.test import TestCase
 from django.utils import timezone
-from ..models import Clinic, Specialty, Doctor, DoctorClinicAffiliation, DoctorSchedule, Patient, Procedure, Visit, Appointment
+
+from ..models import Clinic, Specialty, Doctor, DoctorClinicAffiliation, DoctorSchedule, Patient, Procedure, Visit, \
+    Appointment
+
 
 class ClinicModelTest(TestCase):
 

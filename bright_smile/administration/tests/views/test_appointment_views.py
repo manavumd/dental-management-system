@@ -1,8 +1,5 @@
-from datetime import timedelta
-
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.utils import timezone
 
 from ...models import Clinic, Doctor, Patient, Appointment, Specialty, DoctorClinicAffiliation, DoctorSchedule
 

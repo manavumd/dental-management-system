@@ -1,7 +1,8 @@
 from django.test import TestCase
-from django.utils import timezone
-from ..models import Clinic, Doctor, Specialty, DoctorClinicAffiliation, DoctorSchedule, Patient, Visit, Appointment
+
 from ..forms import ClinicForm, DoctorForm, PatientForm, VisitForm, AppointmentForm, DoctorClinicAffiliationForm
+from ..models import Clinic, Doctor, Specialty, DoctorClinicAffiliation
+
 
 class ClinicFormTest(TestCase):
 

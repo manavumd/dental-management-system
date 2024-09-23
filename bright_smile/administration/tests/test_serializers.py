@@ -1,7 +1,8 @@
 from django.test import TestCase
-from rest_framework.exceptions import ValidationError
+
 from ..models import Clinic, Doctor, Patient, Specialty
 from ..serializers import ClinicSerializer, DoctorSerializer, PatientSerializer, SpecialtySerializer
+
 
 class ClinicSerializerTest(TestCase):
 
