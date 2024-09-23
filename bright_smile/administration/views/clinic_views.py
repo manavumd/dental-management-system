@@ -14,7 +14,7 @@ from ..serializers import ClinicSerializer
 
 # REST API ViewSets
 class ClinicViewSet(viewsets.ModelViewSet):
-    queryset = Clinic.objects.none()
+    queryset = Clinic.objects.all()
     serializer_class = ClinicSerializer
 
 
