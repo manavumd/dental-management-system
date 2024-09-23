@@ -96,24 +96,45 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 7. Create Superuser
+### 7. Adding Specialties (Required to Run the Application)
+
+The application requires the **Specialty** data to be populated. You can add some initial data for specialties using Django's admin or through the shell.
+   
+   Launch the Django shell:
+   ```bash
+   python manage.py shell
+   ```
+   
+   Then in the shell:
+   ```python
+   from administration.models import Specialty
+   Specialty.objects.create(name='Cleaning')
+   Specialty.objects.create(name='Filling')
+   Specialty.objects.create(name='Root Canal')
+   Specialty.objects.create(name='Crown')
+   Specialty.objects.create(name='Teeth Whitening')
+   ```
+
+   Alternatively, you can also create these specialties using the Django admin interface.
+
+### 8. Create Superuser
 - Remember the superuser credentials for accessing the admin portal.
 ```bash
 python manage.py createsuperuser
 ```
 
 
-### 8. Run the Development Server
+### 9. Run the Development Server
 ```bash
 python manage.py runserver
 ```
 
-### 9. Create a user for app in admin portal
+### 10. Create a user for app in admin portal
 1. Go to : **http://127.0.0.1:8000/admin**<br>
 2. Login using superuser credentials<br>
 3. Create a user (remember its username viz. email and password)
 
-### 10. Go to clinics listing
+### 11. Go to clinics listing
 1. Go to : **http://127.0.0.1:8000/administration/clinics**
 2. Login using created user credentials in step 10
 
