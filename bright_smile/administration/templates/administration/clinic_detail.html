@@ -1,0 +1,67 @@
+{% extends "administration/base.html" %}
+
+{% load custom_filter %}
+
+{% block content %}
+<h2>{{ clinic.name }}</h2>
+<p><strong>City:</strong> {{ clinic.city }}</p>
+<p><strong>State:</strong> {{ clinic.state }}</p>
+<p><strong>Phone Number:</strong> {{ clinic.phone_number }}</p>
+<p><strong>Email:</strong> {{ clinic.email }}</p>
+
+<a href="{% url 'clinic_update' clinic.pk %}" class="btn btn-warning">Edit Clinic Information</a>
+
+<h3>Affiliated Doctors</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Doctor</th>
+            <th>Office Address</th>
+            <th>Schedule</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for affiliation in affiliations %}
+        <tr>
+            <td>{{ affiliation.doctor.name }}</td>
+            <td>{{ affiliation.office_address }}</td>
+            <td>
+                <!-- Loop through each schedule for this doctor-clinic affiliation -->
+                <ul>
+
+                    {% for day, schedules in affiliation.schedules.all|group_by_day %}
+                        <li>
+                            <strong>{{ day }}</strong>:
+                            {% for schedule in schedules %}
+                                {{ schedule.start_time }} - {{ schedule.end_time }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                            <br>
+                        </li>
+                        {% empty %}
+                        <li>No schedule available.</li>
+                    {% endfor %}
+
+
+                </ul>
+            </td>
+            <td>
+                <a href="{% url 'edit_affiliation' clinic.id affiliation.id %}" class="btn btn-warning btn-sm">Edit</a>
+                <!-- Button to remove the doctor affiliation -->
+                <form method="POST" action="{% url 'remove_affiliation' affiliation.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No doctors affiliated with this clinic.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'manage_affiliations' clinic.id %}" class="btn btn-primary btn-sm">Affiliate Doctor to Clinic</a>
+
+{% endblock %}

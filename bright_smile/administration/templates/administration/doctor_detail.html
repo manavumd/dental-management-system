@@ -1,0 +1,86 @@
+{% extends "administration/base.html" %}
+{% load custom_filter %}
+
+{% block content %}
+<h2>Doctor: {{ doctor.name }}</h2>
+
+<!-- Doctor Information -->
+<p><strong>NPI:</strong> {{ doctor.NPI }}</p>
+<p><strong>Email:</strong> {{ doctor.email }}</p>
+<p><strong>Phone Number:</strong> {{ doctor.phone_number }}</p>
+<p><strong>Specialties:</strong>
+    {% for specialty in doctor.specialties.all %}
+        {{ specialty.name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+
+<a href="{% url 'doctor_update' doctor.pk %}" class="btn btn-primary">Edit Doctor</a>
+
+<!-- Clinic Affiliations -->
+<h3>Clinic Affiliations</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Clinic Name</th>
+            <th>Office Address</th>
+            <th>Working Days and Hours</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for affiliation in affiliations %}
+        <tr>
+            <td>{{ affiliation.clinic.name }}</td>
+            <td>{{ affiliation.office_address }}</td>
+            <td>
+                {% if affiliation.schedules.all %}
+                    <ul>
+                        {% for day, schedules in affiliation.schedules.all|group_by_day %}
+                        <li>
+                            <strong>{{ day }}</strong>:
+                            {% for schedule in schedules %}
+                                {{ schedule.start_time }} - {{ schedule.end_time }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                            <br>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <ul>No schedule available.</ul>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No affiliations available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Affiliated Patients -->
+<h3>Affiliated Patients</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Patient Name</th>
+            <th>Date of Birth</th>
+            <th>Phone Number</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for patient in affiliated_patients %}
+        <tr>
+            <td>{{ patient.name }}</td>
+            <td>{{ patient.date_of_birth }}</td>
+            <td>{{ patient.phone_number }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No patients affiliated with this doctor.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'doctor_list' %}" class="btn btn-secondary">Back to Doctors List</a>
+{% endblock %}

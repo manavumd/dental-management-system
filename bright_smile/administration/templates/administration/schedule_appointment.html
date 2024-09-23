@@ -1,0 +1,199 @@
+{% extends "administration/base.html" %}
+
+{% block content %}
+<h2>Schedule Appointment for {{ patient.name }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    
+    {{ form.procedure.label_tag }} {{ form.procedure }}
+
+    <div id="clinic-container" style="display: none;">
+        <br>
+        {{ form.clinic.label_tag }} {{ form.clinic }}
+        <span id="no-clinics-message" style="color: red; display: none;">No clinics available for the selected procedure.</span>
+    </div>
+
+    <div id="doctor-container" style="display: none;">
+        <br>
+        {{ form.doctor.label_tag }} {{ form.doctor }}
+        <span id="no-doctors-message" style="color: red; display: none;">No doctors available for the selected clinic and procedure.</span>
+    </div>
+
+    <!-- New section for Doctor's schedule -->
+    <div id="schedule-container" style="display: none;">
+        <br>
+        <h4>Doctor's Schedule</h4>
+        <div id="doctor-schedule"></div>
+    </div>
+
+    <div id="date-container" style="display: none;">
+        <br>
+        <label for="id_date">Select Appointment Date:</label>
+        <input type="date" id="id_date" name="date">
+    </div>
+
+    <div id="slot-container" style="display: none;">
+        <br>
+        <label for="id_date_time">Available Time Slots:</label>
+        <select id="id_date_time" name="date_time"></select>
+        
+    </div>
+    <span id="no-slots-message" style="color: red; display: none;">No available time slots for the selected doctor on this date.</span>
+
+    <br>
+    <button type="submit" class="btn btn-primary" id="submit-button" disabled>Save Appointment</button>
+</form>
+
+<script>
+    const clinicContainer = document.getElementById('clinic-container');
+    const doctorContainer = document.getElementById('doctor-container');
+    const scheduleContainer = document.getElementById('schedule-container');  // New
+    const dateContainer = document.getElementById('date-container');
+    const slotContainer = document.getElementById('slot-container');
+    const submitButton = document.getElementById('submit-button');
+    const noClinicsMessage = document.getElementById('no-clinics-message');
+    const noDoctorsMessage = document.getElementById('no-doctors-message');
+    const noSlotsMessage = document.getElementById('no-slots-message');
+
+    document.getElementById('id_procedure').addEventListener('change', function () {
+        const procedureId = this.value;
+        
+        // Reset and hide elements
+        clinicContainer.style.display = 'none';
+        doctorContainer.style.display = 'none';
+        scheduleContainer.style.display = 'none';  // New
+        dateContainer.style.display = 'none';
+        slotContainer.style.display = 'none';
+        submitButton.disabled = true;
+        noClinicsMessage.style.display = 'none';
+
+        fetch(`/administration/api/get-clinics/?procedure_id=${procedureId}`)
+            .then(response => response.json())
+            .then(data => {
+                const clinicSelect = document.getElementById('id_clinic');
+                clinicSelect.innerHTML = '';  // Clear previous options
+                
+                if (data.length > 0) {
+                    // Clinics available, show clinic dropdown
+                    clinicContainer.style.display = 'block';
+                    data.forEach(clinic => {
+                        const option = new Option(clinic.name, clinic.id);
+                        clinicSelect.add(option);
+                    });
+
+                    clinicSelect.dispatchEvent(new Event('change'));  // Trigger clinic change event
+                } else {
+                    noClinicsMessage.style.display = 'block';  // Show no clinic message
+                }
+            })
+            .catch(() => {
+                noClinicsMessage.style.display = 'block';  // Handle fetch error
+            });
+    });
+
+    document.getElementById('id_clinic').addEventListener('change', function () {
+        const clinicId = this.value;
+        const procedureId = document.getElementById('id_procedure').value;
+
+        // Reset doctor and slot fields
+        doctorContainer.style.display = 'none';
+        scheduleContainer.style.display = 'none';  // New
+        dateContainer.style.display = 'none';
+        slotContainer.style.display = 'none';
+        submitButton.disabled = true;
+        noDoctorsMessage.style.display = 'none';
+
+        fetch(`/administration/api/get-doctors-with-clinic-and-procedure/?clinic_id=${clinicId}&procedure_id=${procedureId}`)
+            .then(response => response.json())
+            .then(data => {
+                const doctorSelect = document.getElementById('id_doctor');
+                doctorSelect.innerHTML = '';  // Clear previous options
+                
+                if (data.length > 0) {
+                    doctorContainer.style.display = 'block';
+                    data.forEach(doctor => {
+                        const option = new Option(doctor.name, doctor.id);
+                        doctorSelect.add(option);
+                    });
+                    doctorSelect.dispatchEvent(new Event('change'));  // Trigger doctor change event
+
+                    // After selecting doctor, display date selection
+                    dateContainer.style.display = 'block';
+                } else {
+                    noDoctorsMessage.style.display = 'block';  // Show no doctors message
+                }
+            })
+            .catch(() => {
+                noDoctorsMessage.style.display = 'block';  // Handle fetch error
+            });
+    });
+
+    document.getElementById('id_doctor').addEventListener('change', function () {
+        const doctorId = this.value;
+        const clinicId = document.getElementById('id_clinic').value;
+
+        // Fetch doctor's schedule for the clinic
+        fetch(`/administration/api/get-doctor-schedule/?doctor_id=${doctorId}&clinic_id=${clinicId}`)
+            .then(response => response.json())
+            .then(data => {
+                const scheduleContainerContent = document.getElementById('doctor-schedule');
+                scheduleContainerContent.innerHTML = '';  // Clear previous schedule
+                
+                if (data.length > 0) {
+                    let scheduleHtml = '<ul>';
+                    data.forEach(schedule => {
+                        scheduleHtml += `<li>${schedule.day_of_week}: ${schedule.start_time} - ${schedule.end_time}</li>`;
+                    });
+                    scheduleHtml += '</ul>';
+                    scheduleContainerContent.innerHTML = scheduleHtml;
+                    scheduleContainer.style.display = 'block';  // Show the schedule
+                } else {
+                    scheduleContainerContent.innerHTML = '<p>No schedule available for the selected doctor at this clinic.</p>';
+                }
+            })
+            .catch(() => {
+                const scheduleContainerContent = document.getElementById('doctor-schedule');
+                scheduleContainerContent.innerHTML = '<p>Error fetching schedule.</p>';
+            });
+    });
+
+    document.getElementById('id_date').addEventListener('change', function () {
+        const doctorId = document.getElementById('id_doctor').value;
+        const clinicId = document.getElementById('id_clinic').value;
+        const appointmentDate = this.value;
+
+        // Reset slot field
+        slotContainer.style.display = 'none';
+        submitButton.disabled = true;
+        noSlotsMessage.style.display = 'none';
+
+        fetch(`/administration/api/get-available-slots/?doctor_id=${doctorId}&clinic_id=${clinicId}&date=${appointmentDate}`)
+            .then(response => response.json())
+            .then(data => {
+                const slotSelect = document.getElementById('id_date_time');
+                slotSelect.innerHTML = '';  // Clear previous options
+                
+                if (data.length > 0) {
+                    slotContainer.style.display = 'block';
+                    data.forEach(slot => {
+                        const option = new Option(slot, slot);  // Slot value can be the time string
+                        slotSelect.add(option);
+                    });
+                    submitButton.disabled = false;  // Enable submit button
+                } else {
+                    noSlotsMessage.style.display = 'block';  // Show no slots message
+                }
+            })
+            .catch(() => {
+                noSlotsMessage.style.display = 'block';  // Handle fetch error
+            });
+    });
+
+    // Trigger slot loading when date is selected
+    document.getElementById('id_date').addEventListener('change', function () {
+        const doctorSelect = document.getElementById('id_doctor');
+        doctorSelect.dispatchEvent(new Event('change'));  // Fetch available slots when date is selected
+    });
+</script>
+{% endblock %}

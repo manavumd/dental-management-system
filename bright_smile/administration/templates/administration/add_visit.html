@@ -1,0 +1,152 @@
+{% extends "administration/base.html" %}
+
+{% block content %}
+<h2 class="mb-4">Add Visit for {{ patient.name }}</h2>
+
+<form method="post" class="needs-validation" novalidate>
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        {{ form.clinic.label_tag }} {{ form.clinic }}
+    </div>
+
+    <div id="doctor-container" class="mb-3" style="display: none;">
+        <label for="id_doctor">{{ form.doctor.label }}</label>
+        {{ form.doctor }}
+    </div>
+
+    <div id="no-doctors-warning" style="display: none; color: red;">
+        No doctors affiliated with this clinic.
+    </div>
+
+    <div id="procedures-container" class="mb-3" style="display: none;">
+        <label for="id_procedures_done">Procedures Done:</label>
+        <div id="id_procedures_done"></div>
+    </div>
+
+    <div id="no-specialties-warning" style="display: none; color: red;">
+        No specialties available for the selected doctor.
+    </div>
+
+    <!-- Hidden date, time, and doctor notes fields -->
+    <div id="visit-details-container" class="mb-3" style="display: none;">
+        <div class="mb-3">
+            <label for="id_date_time">{{ form.date_time.label }}</label>
+            {{ form.date_time }} 
+        </div>
+        
+        <div class="mb-3">
+            <label for="id_doctor_notes">{{ form.doctor_notes.label }}</label>
+            {{ form.doctor_notes }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary" id="submit-button" disabled>Save Visit</button>
+        <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+<script>
+    const doctorContainer = document.getElementById('doctor-container');
+    const proceduresContainer = document.getElementById('procedures-container');
+    const visitDetailsContainer = document.getElementById('visit-details-container');
+    const submitButton = document.getElementById('submit-button');
+    const noDoctorsWarning = document.getElementById('no-doctors-warning');
+    const noSpecialtiesWarning = document.getElementById('no-specialties-warning');
+
+    // Initially hide fields
+    doctorContainer.style.display = 'none';
+    proceduresContainer.style.display = 'none';
+    visitDetailsContainer.style.display = 'none';
+    submitButton.disabled = true;
+
+    document.getElementById('id_clinic').addEventListener('change', function () {
+        const clinicId = this.value;
+        
+        // Hide doctor, procedure, visit details, and warnings initially
+        doctorContainer.style.display = 'none';
+        proceduresContainer.style.display = 'none';
+        visitDetailsContainer.style.display = 'none';
+        submitButton.disabled = true;
+        noDoctorsWarning.style.display = 'none';
+        noSpecialtiesWarning.style.display = 'none';
+
+        fetch(`/administration/api/get-doctors/?clinic_id=${clinicId}`)
+            .then(response => response.json())
+            .then(data => {
+                const doctorSelect = document.getElementById('id_doctor');
+                doctorSelect.innerHTML = '';  // Clear previous options
+
+                if (data.length > 0) {
+                    // Doctors available, show doctor dropdown
+                    doctorContainer.style.display = 'block';
+                    data.forEach(doctor => {
+                        const option = new Option(doctor.doctor__name, doctor.doctor__id);
+                        doctorSelect.add(option);
+                    });
+
+                    const event = new Event('change');
+                    doctorSelect.dispatchEvent(event);  // Trigger the change event manually
+                } else {
+                    // No doctors available, show warning
+                    noDoctorsWarning.style.display = 'block';
+                }
+            })
+            .catch(() => {
+                noDoctorsWarning.style.display = 'block';
+            });
+    });
+
+    document.getElementById('id_doctor').addEventListener('change', function () {
+        const doctorId = this.value;
+        
+        // Hide procedures, visit details, and warnings initially
+        proceduresContainer.style.display = 'none';
+        visitDetailsContainer.style.display = 'none';
+        submitButton.disabled = true;
+        noSpecialtiesWarning.style.display = 'none';
+
+        fetch(`/administration/api/get-specialties/?doctor_id=${doctorId}`)
+            .then(response => response.json())
+            .then(data => {
+                const specialtiesContainer = document.getElementById('id_procedures_done');
+                specialtiesContainer.innerHTML = '';  // Clear previous checkboxes
+
+                if (data.length > 0) {
+                    // Specialties found, show checkboxes
+                    proceduresContainer.style.display = 'block';
+                    data.forEach(specialty => {
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.name = 'procedures_done';
+                        checkbox.value = specialty.id;  // Set the value as the specialty ID
+                        checkbox.id = `specialty_${specialty.id}`;  // Unique ID for each checkbox
+
+                        const label = document.createElement('label');
+                        label.htmlFor = checkbox.id;  // Set the label to be associated with the checkbox
+                        label.textContent = specialty.name;
+
+                        // Append the checkbox and label to the container
+                        specialtiesContainer.appendChild(checkbox);
+                        specialtiesContainer.appendChild(label);
+                        specialtiesContainer.appendChild(document.createElement('br'));  // Add line break
+                    });
+
+                    // Show visit date, time, and doctor notes once procedures are selected
+                    visitDetailsContainer.style.display = 'block';
+
+                    // Enable the submit button
+                    submitButton.disabled = false;
+                } else {
+                    // No specialties available, show warning
+                    noSpecialtiesWarning.style.display = 'block';
+                }
+            })
+            .catch(() => {
+                noSpecialtiesWarning.style.display = 'block';
+            });
+    });
+</script>
+
+{% endblock %}

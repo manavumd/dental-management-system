@@ -1,0 +1,107 @@
+{% extends "administration/base.html" %}
+
+{% block content %}
+<h2>{% if affiliation %}Edit{% else %}Create{% endif %} Doctor Affiliation</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <!-- DoctorClinicAffiliationForm -->
+    {{ affiliation_form.as_p }}
+    
+    <h3>Doctor Schedule</h3>
+    {{ schedule_formset.management_form }}
+
+    <table id="schedule-table">
+        {% for form in schedule_formset %}
+            <tr>
+                {{ form.id }}  <!-- Hidden id field to track existing objects -->
+                <td>{{ form.day_of_week }}</td>
+                <td>{{ form.start_time }}</td>
+                <td>{{ form.end_time }}
+                    
+                </td>
+                <!-- No visible DELETE checkbox, but we will handle deletions -->
+                <td>
+                    <a href="javascript:void(0);" class="remove-form" data-id="{{ form.instance.id }}">Remove</a>
+                    <span style="display: none;">{{form.DELETE}}</span><!-- Hidden DELETE field to handle deletions -->
+                </td>
+                {% if form.end_time.errors %}
+                    <td class="text-danger">
+                        {{ form.end_time.errors }}
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <button type="button" id="add-schedule-btn">Add Schedule</button>
+    
+    <button type="submit" class="btn btn-primary">Save Affiliation</button>
+</form>
+
+<script>
+    // Function to dynamically add a new schedule form
+    document.getElementById('add-schedule-btn').addEventListener('click', function () {
+        const formsetTable = document.getElementById('schedule-table');
+        
+        // Find the total forms input
+        const totalFormsInput = document.querySelector('#id_schedules-TOTAL_FORMS');
+        let totalForms = parseInt(totalFormsInput.value);
+        
+        // Create a new form row
+        const newForm = document.createElement('tr');
+        
+        // Dynamically create the form fields with the correct formset naming convention
+        newForm.innerHTML = `
+            <td>
+                <select name="schedules-${totalForms}-day_of_week">
+                    <option value="Mon">Monday</option>
+                    <option value="Tue">Tuesday</option>
+                    <option value="Wed">Wednesday</option>
+                    <option value="Thu">Thursday</option>
+                    <option value="Fri">Friday</option>
+                    <option value="Sat">Saturday</option>
+                    <option value="Sun">Sunday</option>
+                </select>
+            </td>
+            <td><input type="time" name="schedules-${totalForms}-start_time"></td>
+            <td><input type="time" name="schedules-${totalForms}-end_time"></td>
+            <td>
+                <a href="javascript:void(0);" class="remove-form">Remove</a>
+                <!-- Automatically add a hidden DELETE checkbox for new forms -->
+                <input checked="false" type="hidden" name="schedules-${totalForms}-DELETE" class="delete-checkbox">
+            </td>
+        `;
+    
+        // Insert the new form into the table
+        formsetTable.appendChild(newForm);
+    
+        // Increment and update the total forms count in the management form
+        totalForms += 1;
+        totalFormsInput.value = totalForms;
+    });
+    
+    // Remove a form when clicking the remove button
+    document.addEventListener('click', function (e) {
+        if (e.target && e.target.classList.contains('remove-form')) {
+            const tr = e.target.closest('tr');
+    
+            // Check the hidden DELETE checkbox for this form to mark it for deletion
+            let deleteCheckbox = tr.querySelector('input.delete-checkbox');
+            console.log(deleteCheckbox);
+            if (deleteCheckbox) {
+                deleteCheckbox.setAttribute('checked',true);  // Mark the form for deletion
+                tr.remove();  // Remove the form from the UI
+            } else {
+                deleteCheckbox = tr.querySelector('input[type="checkbox"]');
+                deleteCheckbox.checked = true;
+            }
+    
+            // Optionally hide the form from the UI (but still submit it)
+            tr.style.display = 'none';
+        }
+    });
+    </script>
+
+{% endblock %}

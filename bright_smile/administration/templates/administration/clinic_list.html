@@ -1,0 +1,36 @@
+{% extends "administration/base.html" %}
+{% load custom_filter %}
+{% block content %}
+<h1>Clinics</h1>
+<a href="{% url 'clinic_create' %}" class="btn btn-primary mb-2">Create New Clinic</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Number of Doctors</th>
+            <th>Number of Patients</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for clinic in object_list %}
+        <tr>
+            <td>{{ clinic.name }}</td>
+            <td>{{ clinic.phone_number }}</td>
+            <td>{{ clinic.city }}</td>
+            <td>{{ clinic.state }}</td>
+            <td>{{ clinic.doctorclinicaffiliation_set.all | unique_doctors | length }}</td>
+            <td>{{ clinic.unique_patient_count }}</td>
+            <td>
+                <a href="{% url 'clinic_detail' clinic.pk %}" class="btn btn-info btn-sm">View</a>
+                <a href="{% url 'clinic_update' clinic.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                <a href="{% url 'clinic_delete' clinic.pk %}" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
