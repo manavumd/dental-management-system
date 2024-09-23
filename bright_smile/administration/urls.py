@@ -1,13 +1,14 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import (
-    ClinicListView, ClinicDetailView, ClinicCreateView, ClinicUpdateView, ClinicDeleteView,
-    DoctorListView, DoctorDetailView, DoctorCreateView, DoctorUpdateView, DoctorDeleteView,
-    PatientListView, PatientDetailView, PatientCreateView, PatientUpdateView, PatientDeleteView, manage_affiliations, remove_affiliation,
-    add_visit, schedule_appointment, get_doctors, get_specialties, get_doctors_with_clinic_and_procedure, get_clinics, get_available_slots,
-    delete_appointment, delete_visit, get_doctor_schedule,
-    ClinicViewSet, DoctorViewSet, PatientViewSet, SpecialityViewSet
+from .baseviews import (    
+    SpecialityViewSet
 )
+from .views.clinic_views import ClinicListView, ClinicDetailView, ClinicCreateView, ClinicUpdateView, ClinicDeleteView,manage_affiliations, remove_affiliation,ClinicViewSet, get_clinics
+from .views.doctor_views import DoctorListView, DoctorDetailView, DoctorCreateView, DoctorUpdateView, DoctorDeleteView,DoctorViewSet
+from .views.patient_views import PatientListView, PatientDetailView, PatientCreateView, PatientUpdateView, PatientDeleteView, PatientViewSet
+from .views.visit_views import add_visit,get_doctors, get_specialties,delete_visit
+from .views.appointment_views import schedule_appointment, get_doctors_with_clinic_and_procedure, get_available_slots, delete_appointment, get_doctor_schedule
+
 from django.contrib.auth import views as auth_views
 
 router = DefaultRouter()
