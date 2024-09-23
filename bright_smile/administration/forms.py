@@ -1,7 +1,9 @@
 from django import forms
-from django.forms import BaseInlineFormSet, inlineformset_factory
-from .models import Clinic, Doctor, Patient, DoctorClinicAffiliation, DAYS_OF_WEEK, DoctorSchedule, Specialty,Visit, Appointment
-from django.core.exceptions import ValidationError
+from django.forms import inlineformset_factory
+
+from .models import Clinic, Doctor, Patient, DoctorClinicAffiliation, DAYS_OF_WEEK, DoctorSchedule, Specialty, Visit, \
+    Appointment
+
 
 class ClinicForm(forms.ModelForm):
     class Meta:
