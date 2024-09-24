@@ -20,7 +20,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
 # Doctor CRUD
 class DoctorListView(LoginRequiredMixin, ListView):
     model = Doctor
-    template_name = 'administration/doctor_list.html'
+    template_name = 'administration/doctor/doctor_list.html'
     context_object_name = 'doctors'
 
     def get_queryset(self):
@@ -43,7 +43,7 @@ class DoctorListView(LoginRequiredMixin, ListView):
 
 class DoctorDetailView(LoginRequiredMixin, DetailView):
     model = Doctor
-    template_name = 'administration/doctor_detail.html'
+    template_name = 'administration/doctor/doctor_detail.html'
     context_object_name = 'doctor'
 
     def get_context_data(self, **kwargs):
@@ -70,16 +70,16 @@ class DoctorDetailView(LoginRequiredMixin, DetailView):
 class DoctorCreateView(LoginRequiredMixin, CreateView):
     model = Doctor
     form_class = DoctorForm
-    template_name = 'administration/doctor_form.html'
+    template_name = 'administration/doctor/doctor_form.html'
     success_url = reverse_lazy('doctor_list')
 
 class DoctorUpdateView(LoginRequiredMixin, UpdateView):
     model = Doctor
     form_class = DoctorForm
-    template_name = 'administration/doctor_form.html'
+    template_name = 'administration/doctor/doctor_form.html'
     success_url = reverse_lazy('doctor_list')
 
 class DoctorDeleteView(LoginRequiredMixin, DeleteView):
     model = Doctor
-    template_name = 'administration/doctor_confirm_delete.html'
+    template_name = 'administration/doctor/doctor_confirm_delete.html'
     success_url = reverse_lazy('doctor_list')

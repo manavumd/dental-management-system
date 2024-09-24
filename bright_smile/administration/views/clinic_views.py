@@ -21,7 +21,7 @@ class ClinicViewSet(viewsets.ModelViewSet):
 # Clinic CRUD
 class ClinicListView(LoginRequiredMixin, ListView):
     model = Clinic
-    template_name = 'administration/clinic_list.html'
+    template_name = 'administration/clinic/clinic_list.html'
     context_object_name = 'clinics'
 
     def get_queryset(self):
@@ -50,7 +50,7 @@ class ClinicListView(LoginRequiredMixin, ListView):
 
 class ClinicDetailView(LoginRequiredMixin, DetailView):
     model = Clinic
-    template_name = 'administration/clinic_detail.html'
+    template_name = 'administration/clinic/clinic_detail.html'
 
     context_object_name = 'clinic'
 
@@ -104,10 +104,10 @@ def manage_affiliations(request, clinic_id, affiliation_id=None):
         affiliation_form = DoctorClinicAffiliationForm(instance=affiliation, available_doctors=available_doctors)
         schedule_formset = DoctorScheduleFormSet(instance=affiliation, prefix='schedules')
 
-    return render(request, 'administration/manage_affiliations.html', {'affiliation_form': affiliation_form,
+    return render(request, 'administration/clinic/manage_affiliations.html', {'affiliation_form': affiliation_form,
         'schedule_formset': schedule_formset,
         'clinic_id': clinic_id,
-        })
+                                                                              })
 
 def remove_affiliation(request, affiliation_id):
     affiliation = get_object_or_404(DoctorClinicAffiliation, id=affiliation_id)
@@ -117,18 +117,18 @@ def remove_affiliation(request, affiliation_id):
 class ClinicCreateView(LoginRequiredMixin, CreateView):
     model = Clinic
     form_class = ClinicForm
-    template_name = 'administration/clinic_form.html'
+    template_name = 'administration/clinic/clinic_form.html'
     success_url = reverse_lazy('clinic_list')
 
 class ClinicUpdateView(LoginRequiredMixin, UpdateView):
     model = Clinic
     form_class = ClinicForm
-    template_name = 'administration/clinic_form.html'
+    template_name = 'administration/clinic/clinic_form.html'
     success_url = reverse_lazy('clinic_list')
 
 class ClinicDeleteView(LoginRequiredMixin, DeleteView):
     model = Clinic
-    template_name = 'administration/clinic_confirm_delete.html'
+    template_name = 'administration/clinic/clinic_confirm_delete.html'
     success_url = reverse_lazy('clinic_list')
 
 

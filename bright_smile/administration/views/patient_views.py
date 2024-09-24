@@ -17,7 +17,7 @@ class PatientViewSet(viewsets.ModelViewSet):
 # Patient CRUD
 class PatientListView(LoginRequiredMixin, ListView):
     model = Patient
-    template_name = 'administration/patient_list.html'
+    template_name = 'administration/patient/patient_list.html'
 
     def get_queryset(self):
         patients = Patient.objects.all()
@@ -32,7 +32,7 @@ class PatientListView(LoginRequiredMixin, ListView):
 
 class PatientDetailView(LoginRequiredMixin, DetailView):
     model = Patient
-    template_name = 'administration/patient_detail.html'
+    template_name = 'administration/patient/patient_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -46,16 +46,16 @@ class PatientDetailView(LoginRequiredMixin, DetailView):
 class PatientCreateView(LoginRequiredMixin, CreateView):
     model = Patient
     form_class = PatientForm
-    template_name = 'administration/patient_form.html'
+    template_name = 'administration/patient/patient_form.html'
     success_url = reverse_lazy('patient_list')
 
 class PatientUpdateView(LoginRequiredMixin, UpdateView):
     model = Patient
     form_class = PatientForm
-    template_name = 'administration/patient_form.html'
+    template_name = 'administration/patient/patient_form.html'
     success_url = reverse_lazy('patient_list')
 
 class PatientDeleteView(LoginRequiredMixin, DeleteView):
     model = Patient
-    template_name = 'administration/patient_confirm_delete.html'
+    template_name = 'administration/patient/patient_confirm_delete.html'
     success_url = reverse_lazy('patient_list')
