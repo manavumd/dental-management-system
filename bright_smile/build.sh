@@ -2,14 +2,14 @@
 # Exit on error
 set -o errexit
 
-source .env
+#source ../.env
 
 # Modify this line as needed for your package manager (pip, poetry, etc.)
-pip install -r requirements.txt
+pip install -r ../requirements.txt
 
-cd bright_smile
 # Convert static asset files
 python manage.py collectstatic --no-input
 
 # Apply any outstanding database migrations
+python manage.py makemigrations
 python manage.py migrate
