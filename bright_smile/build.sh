@@ -14,4 +14,7 @@ pip install -r ../requirements.txt
 python manage.py makemigrations
 python manage.py migrate
 
+python manage.py makemigrations administration
+python manage.py migrate administration
+
 python manage.py createsuperuser_if_none
