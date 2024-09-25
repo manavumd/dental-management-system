@@ -44,8 +44,7 @@ def group_by_day(schedules):
     Group schedules by the 'day_of_week' attribute.
     Returns a dictionary where the key is the day of the week and the value is a list of schedules.
     """
-    # Sort the schedules by day_of_week so that groupby works correctly
-    # Define the custom order for days of the week
+
     DAY_ORDER = {
         'Mon': 1,
         'Tue': 2,

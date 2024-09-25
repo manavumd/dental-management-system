@@ -30,7 +30,7 @@ class ClinicViewTests(TestCase):
         self.client.login(username='testuser', password='12345')
         response = self.client.get(reverse('clinic_list'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'administration/clinic_list.html')
+        self.assertTemplateUsed(response, 'administration/clinic/clinic_list.html')
         self.assertContains(response, 'Test Clinic')
 
     def test_clinic_detail_view(self):
@@ -38,7 +38,7 @@ class ClinicViewTests(TestCase):
         self.client.login(username='testuser', password='12345')
         response = self.client.get(reverse('clinic_detail', args=[self.clinic.id]))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'administration/clinic_detail.html')
+        self.assertTemplateUsed(response, 'administration/clinic/clinic_detail.html')
         self.assertContains(response, 'Test Clinic')
 
     def test_clinic_create_view(self):

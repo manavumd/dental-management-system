@@ -21,7 +21,6 @@
                 <td>{{ form.end_time }}
                     
                 </td>
-                <!-- No visible DELETE checkbox, but we will handle deletions -->
                 <td>
                     <a href="javascript:void(0);" class="remove-form" data-id="{{ form.instance.id }}">Remove</a>
                     <span style="display: none;">{{form.DELETE}}</span><!-- Hidden DELETE field to handle deletions -->
@@ -73,11 +72,9 @@
                 <input checked="false" type="hidden" name="schedules-${totalForms}-DELETE" class="delete-checkbox">
             </td>
         `;
-    
-        // Insert the new form into the table
+
         formsetTable.appendChild(newForm);
-    
-        // Increment and update the total forms count in the management form
+
         totalForms += 1;
         totalFormsInput.value = totalForms;
     });
@@ -86,8 +83,7 @@
     document.addEventListener('click', function (e) {
         if (e.target && e.target.classList.contains('remove-form')) {
             const tr = e.target.closest('tr');
-    
-            // Check the hidden DELETE checkbox for this form to mark it for deletion
+
             let deleteCheckbox = tr.querySelector('input.delete-checkbox');
             console.log(deleteCheckbox);
             if (deleteCheckbox) {
@@ -97,8 +93,7 @@
                 deleteCheckbox = tr.querySelector('input[type="checkbox"]');
                 deleteCheckbox.checked = true;
             }
-    
-            // Optionally hide the form from the UI (but still submit it)
+
             tr.style.display = 'none';
         }
     });

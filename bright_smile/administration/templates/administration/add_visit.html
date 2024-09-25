@@ -55,7 +55,7 @@
     const noDoctorsWarning = document.getElementById('no-doctors-warning');
     const noSpecialtiesWarning = document.getElementById('no-specialties-warning');
 
-    // Initially hide fields
+
     doctorContainer.style.display = 'none';
     proceduresContainer.style.display = 'none';
     visitDetailsContainer.style.display = 'none';
@@ -64,7 +64,7 @@
     document.getElementById('id_clinic').addEventListener('change', function () {
         const clinicId = this.value;
         
-        // Hide doctor, procedure, visit details, and warnings initially
+
         doctorContainer.style.display = 'none';
         proceduresContainer.style.display = 'none';
         visitDetailsContainer.style.display = 'none';
@@ -79,7 +79,7 @@
                 doctorSelect.innerHTML = '';  // Clear previous options
 
                 if (data.length > 0) {
-                    // Doctors available, show doctor dropdown
+
                     doctorContainer.style.display = 'block';
                     data.forEach(doctor => {
                         const option = new Option(doctor.doctor__name, doctor.doctor__id);
@@ -87,9 +87,9 @@
                     });
 
                     const event = new Event('change');
-                    doctorSelect.dispatchEvent(event);  // Trigger the change event manually
+                    doctorSelect.dispatchEvent(event);
                 } else {
-                    // No doctors available, show warning
+
                     noDoctorsWarning.style.display = 'block';
                 }
             })
@@ -101,7 +101,7 @@
     document.getElementById('id_doctor').addEventListener('change', function () {
         const doctorId = this.value;
         
-        // Hide procedures, visit details, and warnings initially
+
         proceduresContainer.style.display = 'none';
         visitDetailsContainer.style.display = 'none';
         submitButton.disabled = true;
@@ -111,35 +111,30 @@
             .then(response => response.json())
             .then(data => {
                 const specialtiesContainer = document.getElementById('id_procedures_done');
-                specialtiesContainer.innerHTML = '';  // Clear previous checkboxes
+                specialtiesContainer.innerHTML = '';
 
                 if (data.length > 0) {
-                    // Specialties found, show checkboxes
                     proceduresContainer.style.display = 'block';
                     data.forEach(specialty => {
                         const checkbox = document.createElement('input');
                         checkbox.type = 'checkbox';
                         checkbox.name = 'procedures_done';
-                        checkbox.value = specialty.id;  // Set the value as the specialty ID
-                        checkbox.id = `specialty_${specialty.id}`;  // Unique ID for each checkbox
+                        checkbox.value = specialty.id;
+                        checkbox.id = `specialty_${specialty.id}`;
 
                         const label = document.createElement('label');
-                        label.htmlFor = checkbox.id;  // Set the label to be associated with the checkbox
+                        label.htmlFor = checkbox.id;
                         label.textContent = specialty.name;
-
-                        // Append the checkbox and label to the container
                         specialtiesContainer.appendChild(checkbox);
                         specialtiesContainer.appendChild(label);
-                        specialtiesContainer.appendChild(document.createElement('br'));  // Add line break
+                        specialtiesContainer.appendChild(document.createElement('br'));
                     });
 
-                    // Show visit date, time, and doctor notes once procedures are selected
+
                     visitDetailsContainer.style.display = 'block';
 
-                    // Enable the submit button
                     submitButton.disabled = false;
                 } else {
-                    // No specialties available, show warning
                     noSpecialtiesWarning.style.display = 'block';
                 }
             })

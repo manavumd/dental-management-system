@@ -25,14 +25,11 @@ class ClinicListView(LoginRequiredMixin, ListView):
     context_object_name = 'clinics'
 
     def get_queryset(self):
-        # Prefetch doctor affiliations to avoid extra queries
         clinics = Clinic.objects.prefetch_related('doctorclinicaffiliation_set').all()
 
         for clinic in clinics:
-            # Get doctors affiliated with the clinic
             affiliated_doctors = DoctorClinicAffiliation.objects.filter(clinic=clinic).values_list('doctor', flat=True)
 
-            # Fetch patients from visits and appointments
             past_visits = Visit.objects.filter(clinic=clinic, doctor__in=affiliated_doctors).values_list('patient', flat=True)
             future_appointments = Appointment.objects.filter(
                 clinic=clinic, 

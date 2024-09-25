@@ -20,7 +20,6 @@
             <td>{{ doctor.NPI }}</td>
             <td>{{ doctor.name }}</td>
 
-            <!-- Display specialties as a comma-separated list -->
             <td>
                 {% for specialty in doctor.specialties.all %}
                     {{ specialty.name }}{% if not forloop.last %}, {% endif %}
@@ -29,13 +28,10 @@
                 {% endfor %}
             </td>
 
-            <!-- Display number of affiliated clinics -->
             <td>{{ doctor.doctorclinicaffiliation_set.all|length }}</td>
 
-            <!-- Display number of affiliated patients (unique patients who visited or have appointments) -->
             <td>{{ doctor.unique_patient_count }}</td>
 
-            <!-- Action buttons -->
             <td>
                 <a href="{% url 'doctor_detail' doctor.pk %}" class="btn btn-info btn-sm">View</a>
                 <a href="{% url 'doctor_update' doctor.pk %}" class="btn btn-warning btn-sm">Edit</a>

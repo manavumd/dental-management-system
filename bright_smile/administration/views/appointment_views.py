@@ -44,8 +44,8 @@ def get_available_slots(request):
     appointment_date = request.GET.get('date')  # Expected format: YYYY-MM-DD
 
     # Convert the appointment_date to a datetime object and get the day of the week
-    appointment_date_obj = timezone.make_aware(datetime.strptime(appointment_date, '%Y-%m-%d'))  # Aware datetime
-    day_of_week = appointment_date_obj.strftime('%a')  # Mon, Tue, Wed, etc.
+    appointment_date_obj = timezone.make_aware(datetime.strptime(appointment_date, '%Y-%m-%d'))
+    day_of_week = appointment_date_obj.strftime('%a')
 
     # Fetch the doctor's schedule for the specific clinic and day
     affiliation = DoctorClinicAffiliation.objects.get(doctor_id=doctor_id, clinic_id=clinic_id)
@@ -61,7 +61,6 @@ def get_available_slots(request):
         date_time__date=appointment_date_obj.date()
     )
 
-    # Define appointment slot duration
     appointment_duration = timedelta(minutes=15)
 
     # Initialize available slots based on doctor's working hours
@@ -71,13 +70,11 @@ def get_available_slots(request):
     available_slots = []
     current_time = start_time
 
-    # List existing appointments as time ranges for easy comparison
     booked_ranges = [
         (appointment.date_time, appointment.date_time + appointment_duration)
         for appointment in existing_appointments
     ]
 
-    # Generate slots while checking for conflicts with existing appointments
     while current_time + appointment_duration <= end_time:
         is_conflict = False
         for start, end in booked_ranges:
@@ -86,9 +83,8 @@ def get_available_slots(request):
                 break
 
         if not is_conflict:
-            available_slots.append(current_time.strftime('%Y-%m-%d %H:%M:%S'))  # Full datetime format
+            available_slots.append(current_time.strftime('%Y-%m-%d %H:%M:%S'))
 
-        # Move to the next time slot
         current_time += appointment_duration
 
     if not available_slots:
@@ -99,7 +95,7 @@ def get_available_slots(request):
 
 def delete_appointment(request, appointment_id):
     appointment = get_object_or_404(Appointment, pk=appointment_id)
-    patient_id = appointment.patient.pk  # Save the patient's ID to redirect back after deletion
+    patient_id = appointment.patient.pk
     appointment.delete()
     return redirect('patient_detail', pk=patient_id)
 
@@ -115,5 +111,5 @@ def get_doctor_schedule(request):
     # Fetch the doctor's schedule for that clinic
     schedules = DoctorSchedule.objects.filter(affiliation=affiliation).values('day_of_week', 'start_time', 'end_time')
 
-    schedule_list = list(schedules)  # Convert QuerySet to a list of dictionaries
+    schedule_list = list(schedules)
     return JsonResponse(schedule_list, safe=False)
